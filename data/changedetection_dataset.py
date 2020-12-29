@@ -1,5 +1,5 @@
-from data.base_dataset import BaseDataset, get_transform, get_params
-from data.image_folder import make_dataset
+from .base_dataset import BaseDataset, get_transform, get_params
+from .image_folder import make_dataset
 from PIL import Image
 import os
 import numpy as np

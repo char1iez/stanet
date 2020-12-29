@@ -2,8 +2,10 @@ import argparse
 import os
 from util import util
 import torch
-import models
-import data
+# import models
+# import data
+from ..data import get_option_setter as data_get_option_setter
+from ..models import get_option_setter as models_get_option_setter
 
 
 class BaseOptions():
@@ -64,6 +66,7 @@ class BaseOptions():
         parser.add_argument('--load_iter', type=int, default='0', help='which iteration to load? if load_iter > 0, the code will load models by iter_[load_iter]; otherwise, the code will load models by [epoch]')
         parser.add_argument('--verbose', action='store_true', help='if specified, print more debugging information')
         parser.add_argument('--suffix', default='', type=str, help='customized suffix: opt.name = opt.name + suffix: e.g., {model}_{netG}_size{load_size}')
+        parser.add_argument('--weights', default='', type=str, help='.zip format weights for test and train')
         self.initialized = True
         return parser
 
@@ -82,14 +85,14 @@ class BaseOptions():
 
         # modify model-related parser options
         model_name = opt.model
-        model_option_setter = models.get_option_setter(model_name)
+        model_option_setter = models_get_option_setter(model_name)
         parser = model_option_setter(parser, self.isTrain)
         opt, _ = parser.parse_known_args()  # parse again with new defaults
 
         # modify dataset-related parser options
         dataset_name = opt.dataset_mode
         if dataset_name != 'concat':
-            dataset_option_setter = data.get_option_setter(dataset_name)
+            dataset_option_setter = data_get_option_setter(dataset_name)
             parser = dataset_option_setter(parser, self.isTrain)
 
         # save and return the parser

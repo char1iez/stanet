@@ -1,7 +1,7 @@
 import os
 import collections
 import numpy as np
-from data.base_dataset import BaseDataset, get_transform, get_params
+from .base_dataset import BaseDataset, get_transform, get_params
 from PIL import Image
 
 

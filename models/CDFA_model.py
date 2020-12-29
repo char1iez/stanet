@@ -1,6 +1,10 @@
+import os
+from zipfile import ZipFile
+import tempfile
+
 import torch
 import itertools
-from .base_model import BaseModel
+from .base_model import BaseModel, get_scheduler
 from . import backbone
 import torch.nn.functional as F
 from . import loss
@@ -117,3 +121,50 @@ class CDFAModel(BaseModel):
         self.backward()                   # calculate graidents for G
         self.optimizer_G.step()             # udpate G's weights
         self.optimizer_A.step()
+    
+    def load_weights(self, weights):
+        """load networks from weights.
+        
+        Parameters:
+            weights in .zip format, include model_A.pth and model_F.pth
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with ZipFile(weights) as zipfile:
+                zipfile.extractall(tmpdir)
+                model_a = os.path.join(str(tmpdir), 'model_A.pth')
+                model_f = os.path.join(str(tmpdir), 'model_F.pth')
+                model_path = {'A': model_a, 'F': model_f}
+                for name in self.model_names:
+                    if isinstance(name, str):
+                        net = getattr(self, 'net' + name)
+                        # if isinstance(net, torch.nn.DataParallel):
+                        # net = net.module
+                        # net = net.module  # 适配保存的module
+                        print('loading the model from %s' % model_path[name])
+                        # if you are using PyTorch newer than 0.4 (e.g., built from
+                        # GitHub source), you can remove str() on self.device
+                        state_dict = torch.load(model_path[name], map_location=str(self.device))
+                        
+                        if hasattr(state_dict, '_metadata'):
+                            del state_dict._metadata
+                        # patch InstanceNorm checkpoints prior to 0.4
+                        for key in list(state_dict.keys()):  # need to copy keys here because we mutate in loop
+                            self.__patch_instance_norm_state_dict(state_dict, net, key.split('.'))
+                            # print(key)
+                        net.load_state_dict(state_dict,strict=False)
+    
+    def setup(self, opt):
+        """Load and print networks; create schedulers
+
+        Parameters:
+            opt (Option class) -- stores all the experiment flags; needs to be a subclass of BaseOptions
+        """
+        if self.isTrain:
+            self.schedulers = [get_scheduler(optimizer, opt) for optimizer in self.optimizers]
+        if not self.isTrain or opt.continue_train:
+            if opt.weights:
+                self.load_weights(opt.weights)
+            else:
+                load_suffix = 'iter_%d' % opt.load_iter if opt.load_iter > 0 else opt.epoch
+                self.load_networks(load_suffix)
+        self.print_networks(opt.verbose)
