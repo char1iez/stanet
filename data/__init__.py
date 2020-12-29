@@ -1,9 +1,13 @@
 import importlib
+from pathlib import Path
+import sys
+
 import torch.utils.data
-from data.base_dataset import BaseDataset
 import torch
 from torch.utils.data import ConcatDataset
-from data.data_config import get_dataset_info
+
+from .base_dataset import BaseDataset
+from .data_config import get_dataset_info
 
 
 def find_dataset_using_name(dataset_name):
@@ -13,14 +17,18 @@ def find_dataset_using_name(dataset_name):
     be instantiated. It has to be a subclass of BaseDataset,
     and it is case-insensitive.
     """
+    cwd = str(Path(__file__).parent.parent)
+    sys.path.append(cwd)
     dataset_filename = "data." + dataset_name + "_dataset"
     datasetlib = importlib.import_module(dataset_filename)
 
     dataset = None
     target_dataset_name = dataset_name.replace('_', '') + 'dataset'
     for name, cls in datasetlib.__dict__.items():
-        if name.lower() == target_dataset_name.lower() \
-           and issubclass(cls, BaseDataset):
+        # if name.lower() == target_dataset_name.lower() \
+        #    and issubclass(cls, BaseDataset):
+        #     dataset = cls
+        if name.lower() == target_dataset_name.lower():
             dataset = cls
 
     if dataset is None:
@@ -74,7 +82,7 @@ class CustomDatasetDataLoader():
             #  获取concat的多个数据集列表
             self.dataset_type = opt.dataset_type.split(',')
             #  去除“,”的影响
-            if self.dataset_type[-1] is '':
+            if self.dataset_type[-1] == '':
                 self.dataset_type = self.dataset_type[:-1]
             for dataset_type_ in self.dataset_type:
                 dataset_ = create_single_dataset(opt, dataset_type_)

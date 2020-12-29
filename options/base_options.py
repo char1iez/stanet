@@ -1,14 +1,16 @@
 import argparse
 import os
-from util import util
+
 import torch
+
+from ..util import util
 # import models
 # import data
 from ..data import get_option_setter as data_get_option_setter
 from ..models import get_option_setter as models_get_option_setter
 
 
-class BaseOptions():
+class BaseOptions:
     """This class defines options used during both training and test time.
 
     It also implements several helper functions such as parsing, printing, and saving the options.
@@ -148,3 +150,54 @@ class BaseOptions():
 
         self.opt = opt
         return self.opt
+
+
+class BaseOptionsObj:
+    dataroot = './LEVIR-CD'
+    val_dataroot = './LEVIR-CD'
+    name = 'experiment_name'
+    gpu_ids = '0'
+
+    checkpoints_dir = '/workspace/checkpoints'
+    # model parameters
+    model = 'CDF0'
+    input_nc = 3
+    output_nc = 3
+    arch = 'mynet3'
+    f_c = 64
+    n_class = 2
+    init_type = 'normal'
+    init_gain = 0.02
+    SA_mode = 'BAM'
+
+    # dataset parameters
+    dataset_mode = 'changedetection'
+    val_dataset_mode = 'changedetection'
+    dataset_type = 'CD_LEVIR'
+    val_dataset_type = 'CD_LEVIR'
+    split = 'train'
+    val_split = 'val'
+    json_name = 'train_val_test'
+    val_json_name = 'train_val_test'
+    ds = 1
+
+    angle = 15
+    istest = False
+
+    serial_batches = False
+    num_threads = 4
+    batch_size = 1
+    load_size = 256
+    crop_size = 256
+    max_dataset_size = float('inf')
+    preprocess = 'resize_and_crop'
+
+    no_flip = False
+
+    display_winsize = 256
+    # additional parameters
+    epoch = 'latest'
+    load_iter = '0'
+    verbose = 'store_true'
+    suffix = ''
+    weights = ''

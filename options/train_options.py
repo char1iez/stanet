@@ -1,4 +1,5 @@
 from .base_options import BaseOptions
+from .base_options import BaseOptionsObj
 
 
 class TrainOptions(BaseOptions):
@@ -18,7 +19,7 @@ class TrainOptions(BaseOptions):
         parser.add_argument('--display_port', type=int, default=8097, help='visdom port of the web display')
         parser.add_argument('--update_html_freq', type=int, default=1000, help='frequency of saving training results to html')
         parser.add_argument('--print_freq', type=int, default=100, help='frequency of showing training results on console')
-        parser.add_argument('--no_html', action='store_true', help='do not save intermediate training results to [opt.checkpoints_dir]/[opt.name]/web/')
+        parser.add_argument('--no_html', action='store_true', help='do not save intermediate training results to [self.checkpoints_dir]/[self.name]/web/')
         # network saving and loading parameters
         parser.add_argument('--save_latest_freq', type=int, default=5000, help='frequency of saving the latest results')
         parser.add_argument('--save_epoch_freq', type=int, default=5, help='frequency of saving checkpoints at the end of epochs')
@@ -38,3 +39,61 @@ class TrainOptions(BaseOptions):
 
         self.isTrain = True
         return parser
+
+
+class TrainOptionsObj(BaseOptionsObj):
+    display_freq = 400
+    display_ncols = 4
+    display_env = 'main'
+    display_id = 1
+    display_server = "http://localhost"
+    display_port = 8097
+    update_html_freq = 1000
+    print_freq = 100
+    no_html = True
+    save_latest_freq = 5000
+    save_epoch_freq = 5
+    save_by_iter = False
+    continue_train = False
+    epoch_count = 1
+    lr_decay = 1
+    phase = 'train'
+    niter = 100
+    niter_decay = 100
+    beta1 = 0.5
+    lr = 0.0002
+    lr_policy = 'linear'
+    lr_decay_iters = 50
+    isTrain = True
+
+    def __init__(self,
+                 name=None,
+                 data=None,
+                 epochs=None,
+                 project=None,
+                 quick=False,
+                 weights=None,
+                 output=None,
+                 statusbar=None,
+                 batch_size=4,
+                 lr=0.001,
+                 chip_size=256,
+                 angle=15,
+                 model_name='CDFA',
+                 SA_mode='PAM',
+                 preprocess='rotate_and_crop',
+                 save_epoch_freq=5):
+        super(TrainOptionsObj, self).__init__()
+        self.name = name
+        self.epochs = epochs
+        self.dataroot = data
+        self.val_dataroot = data
+        self.batch_size = batch_size
+        self.lr = lr
+        self.crop_size = chip_size
+        self.anlge = angle
+        self.model = model_name
+        self.SA_mode = SA_mode
+        self.preprocess = preprocess
+        self.save_epoch_freq = save_epoch_freq
+        self.statusbar = statusbar

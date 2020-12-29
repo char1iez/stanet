@@ -1,4 +1,5 @@
 from .base_options import BaseOptions
+from .base_options import BaseOptionsObj
 
 
 class TestOptions(BaseOptions):
@@ -20,3 +21,36 @@ class TestOptions(BaseOptions):
         parser.set_defaults(load_size=parser.get_default('crop_size'))
         self.isTrain = False
         return parser
+
+
+class TestOptionsObj(BaseOptionsObj):
+    ntest = float('inf')
+    results_dir = './results'
+    aspect_ratio = 1.0
+    phase = 'test'
+    eval = True
+    num_test = float('inf')
+    load_size = 256
+    dataset_mode = 'changedetection'
+    isTrain = False
+
+    def __init__(
+            self,
+            name=None,
+            statusbar=None,
+            source=None,
+            output=None,
+            model=None,
+            model_name='CDFA',
+            chip_size=480):
+        super(TestOptionsObj, self).__init__()
+        self.name = name
+        self.n_class = 2
+        self.SA_mode = 'PAM'
+        self.arch = 'mynet3'
+        self.model = model_name
+        self.weights = model
+        self.dataroot = source
+        self.results_dir = output
+        self.statusbar = statusbar
+        self.chip_size = chip_size
