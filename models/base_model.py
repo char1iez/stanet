@@ -194,7 +194,7 @@ class BaseModel(ABC):
                 if len(self.gpu_ids) > 0 and torch.cuda.is_available():
                     # torch.save(net.module.cpu().state_dict(), save_path)
                     torch.save(net.cpu().state_dict(), save_path)
-                    net.cuda(self.gpu_ids[0])
+                    net.cuda(int(self.gpu_ids[0]))
                 else:
                     torch.save(net.cpu().state_dict(), save_path)
 
@@ -323,8 +323,6 @@ class BaseModel(ABC):
             if net is not None:
                 for param in net.parameters():
                     param.requires_grad = requires_grad
-
-
 
 
 if __name__ == '__main__':

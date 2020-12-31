@@ -1,6 +1,4 @@
 import importlib
-from pathlib import Path
-import sys
 
 import torch.utils.data
 import torch
@@ -17,18 +15,14 @@ def find_dataset_using_name(dataset_name):
     be instantiated. It has to be a subclass of BaseDataset,
     and it is case-insensitive.
     """
-    cwd = str(Path(__file__).parent.parent)
-    sys.path.append(cwd)
-    dataset_filename = "data." + dataset_name + "_dataset"
-    datasetlib = importlib.import_module(dataset_filename)
+    dataset_filename = "." + dataset_name + "_dataset"
+    datasetlib = importlib.import_module(dataset_filename, __package__)
 
     dataset = None
     target_dataset_name = dataset_name.replace('_', '') + 'dataset'
     for name, cls in datasetlib.__dict__.items():
-        # if name.lower() == target_dataset_name.lower() \
-        #    and issubclass(cls, BaseDataset):
-        #     dataset = cls
-        if name.lower() == target_dataset_name.lower():
+        if name.lower() == target_dataset_name.lower() \
+           and issubclass(cls, BaseDataset):
             dataset = cls
 
     if dataset is None:

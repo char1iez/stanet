@@ -51,10 +51,9 @@ class TrainOptionsObj(BaseOptionsObj):
     update_html_freq = 1000
     print_freq = 100
     no_html = True
-    save_latest_freq = 5000
+    save_latest_freq = 200
     save_epoch_freq = 5
     save_by_iter = False
-    continue_train = False
     epoch_count = 1
     lr_decay = 1
     phase = 'train'
@@ -82,7 +81,8 @@ class TrainOptionsObj(BaseOptionsObj):
                  model_name='CDFA',
                  SA_mode='PAM',
                  preprocess='rotate_and_crop',
-                 save_epoch_freq=5):
+                 save_epoch_freq=5,
+                 resume=False):
         super(TrainOptionsObj, self).__init__()
         self.name = name
         self.epochs = epochs
@@ -97,3 +97,7 @@ class TrainOptionsObj(BaseOptionsObj):
         self.preprocess = preprocess
         self.save_epoch_freq = save_epoch_freq
         self.statusbar = statusbar
+        self.continue_train = resume
+        self.checkpoints_dir = project
+        self.output = output
+        self.weights = weights

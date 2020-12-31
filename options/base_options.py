@@ -197,7 +197,7 @@ class BaseOptionsObj:
     display_winsize = 256
     # additional parameters
     epoch = 'latest'
-    load_iter = '0'
+    load_iter = 0
     verbose = 'store_true'
     suffix = ''
     weights = ''

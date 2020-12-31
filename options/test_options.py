@@ -42,7 +42,8 @@ class TestOptionsObj(BaseOptionsObj):
             output=None,
             model=None,
             model_name='CDFA',
-            chip_size=480):
+            chip_size=480,
+            format='.geojson'):
         super(TestOptionsObj, self).__init__()
         self.name = name
         self.n_class = 2
@@ -54,3 +55,4 @@ class TestOptionsObj(BaseOptionsObj):
         self.results_dir = output
         self.statusbar = statusbar
         self.chip_size = chip_size
+        self.format = format

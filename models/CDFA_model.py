@@ -1,6 +1,7 @@
 import os
 from zipfile import ZipFile
 import tempfile
+from pathlib import Path
 
 import torch
 import itertools
@@ -21,7 +22,8 @@ class CDFAModel(BaseModel):
         return parser
     def __init__(self, opt):
 
-        BaseModel.__init__(self, opt)
+        # BaseModel.__init__(self, opt)
+        super(CDFAModel, self).__init__(opt)
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
         self.loss_names = ['f']
         # specify the images you want to save/display. The training/test scripts will call <BaseModel.get_current_visuals>
@@ -31,7 +33,7 @@ class CDFAModel(BaseModel):
         if self.istest:
             self.visual_names = ['A', 'B', 'pred_L_show']  # visualizations for A and B
 
-        self.visual_features = ['feat_A','feat_B']
+        self.visual_features = ['feat_A', 'feat_B']
         # specify the models you want to save to the disk. The training/test scripts will call <BaseModel.save_networks> and <BaseModel.load_networks>.
         if self.isTrain:
             self.model_names = ['F','A']
@@ -76,7 +78,7 @@ class CDFAModel(BaseModel):
             self.forward()
             self.compute_visuals()
             if val:  # 返回score
-                from util.metrics import RunningMetrics
+                from ..util.metrics import RunningMetrics
                 metrics = RunningMetrics(self.n_class)
                 pred = self.pred_L.long()
 
@@ -128,6 +130,7 @@ class CDFAModel(BaseModel):
         Parameters:
             weights in .zip format, include model_A.pth and model_F.pth
         """
+        print('loading weights from {}...'.format(weights))
         with tempfile.TemporaryDirectory() as tmpdir:
             with ZipFile(weights) as zipfile:
                 zipfile.extractall(tmpdir)
@@ -147,11 +150,11 @@ class CDFAModel(BaseModel):
                         
                         if hasattr(state_dict, '_metadata'):
                             del state_dict._metadata
-                        # patch InstanceNorm checkpoints prior to 0.4
-                        for key in list(state_dict.keys()):  # need to copy keys here because we mutate in loop
-                            self.__patch_instance_norm_state_dict(state_dict, net, key.split('.'))
-                            # print(key)
-                        net.load_state_dict(state_dict,strict=False)
+                        # # patch InstanceNorm checkpoints prior to 0.4
+                        # for key in list(state_dict.keys()):  # need to copy keys here because we mutate in loop
+                        #     self.__patch_instance_norm_state_dict(state_dict, net, key.split('.'))
+                        #     # print(key)
+                        net.load_state_dict(state_dict, strict=False)
     
     def setup(self, opt):
         """Load and print networks; create schedulers
@@ -161,10 +164,21 @@ class CDFAModel(BaseModel):
         """
         if self.isTrain:
             self.schedulers = [get_scheduler(optimizer, opt) for optimizer in self.optimizers]
+            if opt.weights:
+                self.load_weights(opt.weights)
+
         if not self.isTrain or opt.continue_train:
             if opt.weights:
                 self.load_weights(opt.weights)
             else:
-                load_suffix = 'iter_%d' % opt.load_iter if opt.load_iter > 0 else opt.epoch
+                load_suffix = 'iter_%d' % opt.load_iter if opt.load_iter > 0 else self.find_latest(opt)
                 self.load_networks(load_suffix)
         self.print_networks(opt.verbose)
+
+    def find_latest(self, opt):
+        save_dir = Path(os.path.join(opt.checkpoints_dir, opt.name))
+        for filename in save_dir.iterdir():
+            if filename.stem.startswith('latest_'):
+                model_name = filename.stem
+                model_temp = model_name.split('_')
+                return '_'.join(model_temp[:2])
