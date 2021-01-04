@@ -198,6 +198,6 @@ class BaseOptionsObj:
     # additional parameters
     epoch = 'latest'
     load_iter = 0
-    verbose = 'store_true'
+    verbose = False
     suffix = ''
     weights = ''

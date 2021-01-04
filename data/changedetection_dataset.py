@@ -28,7 +28,7 @@ class ChangeDetectionDataset(BaseDataset):
         if not self.istest:
             self.L_paths = sorted(make_dataset(os.path.join(opt.dataroot, folder_L), opt.max_dataset_size))
 
-        print(self.A_paths)
+        # print(self.A_paths)
 
     def __getitem__(self, index):
         A_path = self.A_paths[index]

@@ -77,8 +77,8 @@ class Visualizer():
             import visdom
             self.ncols = opt.display_ncols
             self.vis = visdom.Visdom(server=opt.display_server, port=opt.display_port, env=opt.display_env)
-            if not self.vis.check_connection():
-                self.create_visdom_connections()
+            # if not self.vis.check_connection():
+            #     self.create_visdom_connections()
 
         if self.use_html:  # create an HTML object at <checkpoints_dir>/web/; images will be saved under <checkpoints_dir>/web/images/
             self.web_dir = os.path.join(opt.checkpoints_dir, opt.name, 'web')
