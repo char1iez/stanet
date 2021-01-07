@@ -14,7 +14,7 @@ import torchvision.transforms as transforms
 
 class RasterDataset(Dataset):
 
-    def __init__(self, opt, chip_size=480, stride=0):
+    def __init__(self, opt, chip_size=480, stride=None):
         imgs = opt.dataroot
         self.isTest = True
         self.ext = ['.jpg', '.png', '.img', '.tif']
@@ -39,7 +39,7 @@ class RasterDataset(Dataset):
         self.img_padding_seq = []
         self.img_size_seq = []
         self.chip_size = chip_size
-        self.stride = stride if stride is not None else chip_size // 4
+        self.stride = stride if stride is not None else chip_size // 2
         self.clip_stride = self.chip_size - self.stride
         self.idx_map = {}
         self.transforms = {}

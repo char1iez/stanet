@@ -45,7 +45,7 @@ class TrainOptionsObj(BaseOptionsObj):
     display_freq = 400
     display_ncols = 4
     display_env = 'main'
-    display_id = 1
+    display_id = -1
     display_server = "http://localhost"
     display_port = 8097
     update_html_freq = 1000
