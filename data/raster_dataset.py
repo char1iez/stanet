@@ -86,7 +86,10 @@ class RasterDataset(Dataset):
         img_a_p = (self.imgs / 'A') / img
         img_b_p = (self.imgs / 'B') / img
         with rasterio.open(img_a_p) as fp:
-            bands = (1, 2, 3,) if len(fp.units) >= 3 else (1,)
+            if len(fp.units) >= 3:
+                bands = (1, 2, 3)
+            else:
+                bands = (1,)
             a_im = fp.read(
                 bands,
                 window=Window(local_x, local_y, self.chip_size, self.chip_size),
@@ -100,7 +103,10 @@ class RasterDataset(Dataset):
             a_im = a_im[np.newaxis, :]
 
         with rasterio.open(img_b_p) as fp:
-            bands = (1, 2, 3,) if len(fp.units) >= 3 else (1,)
+            if len(fp.units) >= 3:
+                bands = (1, 2, 3)
+            else:
+                bands = (1,)
             b_im = fp.read(
                 bands,
                 window=Window(local_x, local_y, self.chip_size, self.chip_size),
